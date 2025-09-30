@@ -1,39 +1,81 @@
+# name: CI/CD Deployment
+
+# # Trigger workflow on push to master branch
+# on:
+#   push:
+#     branches:
+#       - master # Run workflow only when master is updated
+
+# jobs:
+#   deploy:
+#     runs-on: ubuntu-latest # GitHub-hosted Ubuntu runner
+
+#     steps:
+#       # 1️⃣ Checkout the repository code
+#       - name: Checkout code
+#         uses: actions/checkout@v3
+#         # Pulls your repo into the GitHub runner environment
+
+#       # 2️⃣ Setup Node.js
+#       - name: Setup Node.js
+#         uses: actions/setup-node@v3
+#         with:
+#           node-version: "18"
+#         # Installs Node.js on runner for npm commands
+
+#       # 3️⃣ Install dependencies and build React on runner
+#       - name: Install dependencies and build React
+#         run: |
+#           cd server
+#           npm install             # Install backend dependencies (for local testing if needed)
+#           cd ../client
+#           npm install             # Install frontend dependencies
+#           npm run build           # Build React for production
+
+#       # 4️⃣ Deploy to EC2 via SSH
+#       - name: Deploy to EC2
+#         uses: appleboy/ssh-action@v0.1.9
+#         with:
+#           host: ${{ secrets.EC2_HOST }} # EC2 IP
+#           username: ${{ secrets.EC2_USER }} # EC2 SSH user
+#           key: ${{ secrets.EC2_KEY }} # EC2 private key
+#           script: |
+#             # Navigate to deployment folder on EC2
+#             cd /home/ubuntu/www/deployment
+
+#             # Reset local changes and pull latest code
+#             git reset --hard
+#             git pull origin master
+
+#             # 1️⃣ Install backend dependencies and restart backend
+#             cd server
+#             npm install
+#             pm2 restart backend || pm2 start server.js --name backend
+
+#             # 2️⃣ Install frontend dependencies and rebuild React on EC2
+#             cd ../client
+#             npm install
+#             npm run build
+
 name: CI/CD Deployment
 
 # Trigger workflow on push to master branch
 on:
   push:
     branches:
-      - master # Run workflow only when master is updated
+      - master
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest # GitHub-hosted Ubuntu runner
+    runs-on: ubuntu-latest
 
     steps:
       # 1️⃣ Checkout the repository code
       - name: Checkout code
         uses: actions/checkout@v3
-        # Pulls your repo into the GitHub runner environment
 
-      # 2️⃣ Setup Node.js
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: "18"
-        # Installs Node.js on runner for npm commands
-
-      # 3️⃣ Install dependencies and build React on runner
-      - name: Install dependencies and build React
-        run: |
-          cd server
-          npm install             # Install backend dependencies (for local testing if needed)
-          cd ../client
-          npm install             # Install frontend dependencies
-          npm run build           # Build React for production
-
-      # 4️⃣ Deploy to EC2 via SSH
-      - name: Deploy to EC2
+      # 2️⃣ Deploy to EC2 via SSH
+      - name: Deploy Dockerized MERN App to EC2
         uses: appleboy/ssh-action@v0.1.9
         with:
           host: ${{ secrets.EC2_HOST }} # EC2 IP
@@ -43,16 +85,24 @@ jobs:
             # Navigate to deployment folder on EC2
             cd /home/ubuntu/www/deployment
 
-            # Reset local changes and pull latest code
+            # Pull latest code
             git reset --hard
             git pull origin master
 
-            # 1️⃣ Install backend dependencies and restart backend
+            # -----------------------------
+            # Backend: build and run Docker
+            # -----------------------------
             cd server
-            npm install
-            pm2 restart backend || pm2 start server.js --name backend
+            docker build -t backend .
+            docker stop backend || true
+            docker rm backend || true
+            docker run -d -p 5000:5000 --name backend backend
 
-            # 2️⃣ Install frontend dependencies and rebuild React on EC2
+            # -----------------------------
+            # Frontend: build and run Docker
+            # -----------------------------
             cd ../client
-            npm install
-            npm run build
+            docker build -t frontend .
+            docker stop frontend || true
+            docker rm frontend || true
+            docker run -d -p 80:80 --name frontend frontend
