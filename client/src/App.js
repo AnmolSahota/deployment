@@ -4,9 +4,9 @@ import logo from "./logo.svg";
 
 function App() {
   const [message, setMessage] = useState("");
-
+  let IP = "http://3.25.216.196";
   const fetchMessage = () => {
-    fetch("http://YOUR_EC2_PUBLIC_IP:5000/api/hello")
+    fetch(`${IP}:5000/api/hello`)
       .then((res) => res.json())
       .then((data) => setMessage(data.message))
       .catch((err) => console.error("Error fetching message:", err));
