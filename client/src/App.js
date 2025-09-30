@@ -6,7 +6,7 @@ function App() {
   const [message, setMessage] = useState("");
   let IP = "http://16.176.169.191";
   const fetchMessage = () => {
-    fetch(`${IP}:5000/api/hello`)
+    fetch(`${IP}/api/hello`)
       .then((res) => res.json())
       .then((data) => setMessage(data.message))
       .catch((err) => console.error("Error fetching message:", err));
