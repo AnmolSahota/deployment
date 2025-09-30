@@ -7,7 +7,7 @@ app.use(cors());
 app.use(express.json());
 
 app.get("/api/hello", (req, res) => {
-  res.json({ message: "Hello to you from Express Server on EC2!" });
+  res.json({ message: "Hello to you from Express Server on EC2 Server!" });
 });
 
 app.listen(PORT, () => {

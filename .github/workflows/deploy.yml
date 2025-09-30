@@ -4,43 +4,55 @@ name: CI/CD Deployment
 on:
   push:
     branches:
-      - master
+      - master # Run workflow only when master is updated
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest # GitHub-hosted Ubuntu runner
 
     steps:
-      # 1️⃣ Checkout the repo
+      # 1️⃣ Checkout the repository code
       - name: Checkout code
         uses: actions/checkout@v3
+        # Pulls your repo into the GitHub runner environment
 
       # 2️⃣ Setup Node.js
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: "18"
+        # Installs Node.js on runner for npm commands
 
-      # 3️⃣ Install dependencies and build React
+      # 3️⃣ Install dependencies and build React on runner
       - name: Install dependencies and build React
         run: |
           cd server
-          npm install
+          npm install             # Install backend dependencies (for local testing if needed)
           cd ../client
-          npm install
-          npm run build
+          npm install             # Install frontend dependencies
+          npm run build           # Build React for production
 
       # 4️⃣ Deploy to EC2 via SSH
       - name: Deploy to EC2
         uses: appleboy/ssh-action@v0.1.9
         with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USER }}
-          key: ${{ secrets.EC2_KEY }}
+          host: ${{ secrets.EC2_HOST }} # EC2 IP
+          username: ${{ secrets.EC2_USER }} # EC2 SSH user
+          key: ${{ secrets.EC2_KEY }} # EC2 private key
           script: |
+            # Navigate to deployment folder on EC2
             cd /home/ec2-user/www/deployment
+
+            # Reset local changes and pull latest code
             git reset --hard
             git pull origin master
+
+            # 1️⃣ Install backend dependencies and restart backend
             cd server
             npm install
             pm2 restart backend || pm2 start index.js --name backend
+
+            # 2️⃣ Install frontend dependencies and rebuild React on EC2
+            cd ../client
+            npm install
+            npm run build
