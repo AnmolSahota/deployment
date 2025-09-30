@@ -46,4 +46,4 @@ jobs:
             sudo docker build -t frontend .
             sudo docker stop frontend || true
             sudo docker rm frontend || true
-            sudo docker run -d -p 80:80 --name frontend frontend
+            sudo docker run -d -p 3000:3000 --name frontend frontend
