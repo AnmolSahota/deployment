@@ -4,7 +4,7 @@ import logo from "./logo.svg";
 
 function App() {
   const [message, setMessage] = useState("");
-  let IP = "http://3.25.216.196";
+  let IP = "http://16.176.169.191";
   const fetchMessage = () => {
     fetch(`${IP}:5000/api/hello`)
       .then((res) => res.json())
@@ -18,7 +18,9 @@ function App() {
         <img src={logo} className="App-logo" alt="logo" />
         Learned a CI-CD
         <p>{message || "Click the button to get a message from backend"}</p>
-        <button onClick={fetchMessage}>Fetch FROM backend ubntu EC2 Server</button>
+        <button onClick={fetchMessage}>
+          Fetch FROM backend ubntu EC2 Server
+        </button>
       </header>
     </div>
   );
