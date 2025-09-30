@@ -33,7 +33,7 @@ jobs:
             # -----------------------------
             # Backend: build and run Docker
             # -----------------------------
-            cd server
+            cd server 
             sudo docker build -t backend .
             sudo docker stop backend || true
             sudo docker rm backend || true
@@ -46,4 +46,4 @@ jobs:
             sudo docker build -t frontend .
             sudo docker stop frontend || true
             sudo docker rm frontend || true
-            sudo docker run -d -p 3000:3000 --name frontend frontend
+            sudo docker run -d -p 3000:80 --name frontend frontend
