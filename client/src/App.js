@@ -15,9 +15,11 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">
-        test this for CI CD
         <img src={logo} className="App-logo" alt="logo" />
-        <p>{message || "Click the button to get a message from backend"}</p>
+        <p>
+          {message ||
+            "Click the button to get a message from backend TEST CI-CD"}
+        </p>
         <button onClick={fetchMessage}>Get Message</button>
       </header>
     </div>
