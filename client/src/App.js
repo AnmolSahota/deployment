@@ -18,7 +18,7 @@ function App() {
         <img src={logo} className="App-logo" alt="logo" />
         Learned a CI-CD
         <p>{message || "Click the button to get a message from backend"}</p>
-        <button onClick={fetchMessage}>Fetch FROM backend EC2 Server</button>
+        <button onClick={fetchMessage}>Fetch FROM backend ubntu EC2 Server</button>
       </header>
     </div>
   );

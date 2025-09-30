@@ -41,7 +41,7 @@ jobs:
           key: ${{ secrets.EC2_KEY }} # EC2 private key
           script: |
             # Navigate to deployment folder on EC2
-            cd /home/ec2-user/www/deployment
+            cd /home/ubuntu/www/deployment
 
             # Reset local changes and pull latest code
             git reset --hard
@@ -50,7 +50,7 @@ jobs:
             # 1️⃣ Install backend dependencies and restart backend
             cd server
             npm install
-            pm2 restart backend || pm2 start index.js --name backend
+            pm2 restart backend || pm2 start server.js --name backend
 
             # 2️⃣ Install frontend dependencies and rebuild React on EC2
             cd ../client
