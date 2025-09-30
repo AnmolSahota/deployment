@@ -1,13 +1,17 @@
-# Stage 1: Build React
-FROM node:18 AS build
+FROM node:18
 WORKDIR /usr/src/app
 COPY package*.json ./
 RUN npm install
 COPY . .
+
+# Build React
 RUN npm run build
 
-# Stage 2: Serve with Nginx
-FROM nginx:alpine
-COPY --from=build /usr/src/app/build /usr/share/nginx/html
+# Install a simple static server
+RUN npm install -g serve
+
+# Expose container port
 EXPOSE 3000
-CMD ["nginx", "-g", "daemon off;"]
+
+# Start the static server
+CMD ["serve", "-s", "build", "-l", "3000"]
