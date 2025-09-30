@@ -1,0 +1,46 @@
+name: CI/CD Deployment
+
+# Trigger workflow on push to master branch
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1️⃣ Checkout the repo
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # 2️⃣ Setup Node.js
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      # 3️⃣ Install dependencies and build React
+      - name: Install dependencies and build React
+        run: |
+          cd server
+          npm install
+          cd ../client
+          npm install
+          npm run build
+
+      # 4️⃣ Deploy to EC2 via SSH
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@v0.1.9
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_KEY }}
+          script: |
+            cd /var/www/deployment
+            git reset --hard
+            git pull origin master
+            cd server
+            npm install
+            pm2 restart backend || pm2 start index.js --name backend
